@@ -16,6 +16,12 @@ app.disable("x-powered-by"); // hide the fact that we are using Express
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(
+  cors({
+    credentials: true,
+    origin: "http://localhost:5173",
+  })
+);
+app.use(
   session({
     name: process.env.SESS_NAME,
     secret: process.env.SESS_SECRET,

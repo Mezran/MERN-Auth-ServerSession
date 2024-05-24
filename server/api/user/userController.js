@@ -35,21 +35,25 @@ export const userLogin = asyncHandler(async (req, res) => {
 
 // DELETE /api/user/logout
 export const userLogout = asyncHandler(async (req, res) => {
-  const { session } = req;
-  const user = session.user;
+  const { user } = req.session;
 
   if (!user) throw new Error("You are not logged in");
 
   req.session.destroy((err) => {
     if (err) throw err;
     res.clearCookie(process.env.SESS_NAME);
+    res.session = null;
     res.send(user);
   });
 });
 
 // GET /api/user
 export const userSession = asyncHandler(async (req, res) => {
+  console.log("session", req.session);
   const { user } = req.session;
   if (!user) throw new Error("You are not logged in");
-  res.send({ user });
+
+  const sessionUser = sessionizeUser(user);
+  req.session.user = sessionUser;
+  res.send(sessionUser);
 });

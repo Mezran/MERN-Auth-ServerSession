@@ -7,7 +7,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { Link as RRDLink, useNavigate } from "react-router-dom";
 
 // Redux
-import { useUserRegisterMutation } from "../../../redux/user/userApiSlice";
+import { useUserLoginMutation } from "../../../redux/user/userApiSlice";
 
 // React Hook Form, yup, resolver, and devtool
 import { useForm } from "react-hook-form";
@@ -19,30 +19,24 @@ import { DevTool } from "@hookform/devtools";
 import CTextField from "../../../components/customMUI/cTextField/CTextField";
 
 // const FileName
-const PageUserRegister = () => {
+const PageUserLogin = () => {
   // local state
   // React Router Dom
   const navigate = useNavigate();
 
   // Redux
-  const [userRegister] = useUserRegisterMutation();
+  const [userLogin] = useUserLoginMutation();
 
   // React Hook Form
   // - schema
   const schema = yup.object().shape({
-    username: yup.string().required(),
     email: yup.string().email().required(),
     password: yup.string().min(1).max(32).required(),
-    passwordConfirm: yup
-      .string()
-      .oneOf([yup.ref("password"), null], "Passwords must match"),
   });
   // - defaultValues
   const defaultValues = {
-    username: "",
     email: "",
     password: "",
-    passwordConfirm: "",
   };
   // - const {} = useForm;
   const { handleSubmit, resetField, control } = useForm({
@@ -52,10 +46,9 @@ const PageUserRegister = () => {
 
   // onXXSubmit
   const onFormSubmit = async (data) => {
-    const { error } = await userRegister(data);
-    error
-      ? (resetField("password"), resetField("passwordConfirm"))
-      : navigate("/dashboard");
+    const { error } = await userLogin(data);
+    console.log("errors", error);
+    error ? resetField("password") : navigate("/dashboard");
   };
 
   // return () {}
@@ -66,7 +59,7 @@ const PageUserRegister = () => {
           <LockOutlinedIcon />
         </Avatar>
         <Typography variant="h5" mt={1}>
-          Register
+          Login
         </Typography>
         <Box
           mt={1}
@@ -75,7 +68,6 @@ const PageUserRegister = () => {
           noValidate
           width="100%"
         >
-          <CTextField name="username" label="Username" control={control} required />
           <CTextField name="email" label="Email" control={control} required />
           <CTextField
             name="password"
@@ -84,22 +76,15 @@ const PageUserRegister = () => {
             required
             type="password"
           />
-          <CTextField
-            name="passwordConfirm"
-            label="Confirm Password"
-            control={control}
-            required
-            type="password"
-          />
 
           <Button type="submit" fullWidth variant="contained" sx={{ my: 2 }}>
-            Register
+            Login
           </Button>
           <Grid container>
             <Grid item xs />
             <Grid item>
-              <Link component={RRDLink} to="/user/login" variant="body2">
-                Already have an account? Login here!
+              <Link component={RRDLink} to="/user/register" variant="body2">
+                Need an account? Register here!
               </Link>
             </Grid>
           </Grid>
@@ -111,4 +96,4 @@ const PageUserRegister = () => {
 };
 
 // export default
-export default PageUserRegister;
+export default PageUserLogin;

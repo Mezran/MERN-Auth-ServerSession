@@ -1,5 +1,7 @@
 import Joi from "joi";
-const email = Joi.string().email().required();
+const email = Joi.string()
+  .email({ tlds: { allow: false } })
+  .required();
 const username = Joi.string().alphanum().min(1).max(30).required();
 const message =
   "must be between 1-32 characters, " +
