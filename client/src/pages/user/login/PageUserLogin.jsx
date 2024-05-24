@@ -4,7 +4,8 @@ import { Container, Box, Avatar, Typography, Button, Link, Grid } from "@mui/mat
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 // React Router Dom
-import { Link as RRDLink, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Link as RRDLink, useNavigate, Navigate } from "react-router-dom";
 
 // Redux
 import { useUserLoginMutation } from "../../../redux/user/userApiSlice";
@@ -47,11 +48,13 @@ const PageUserLogin = () => {
   // onXXSubmit
   const onFormSubmit = async (data) => {
     const { error } = await userLogin(data);
-    console.log("errors", error);
     error ? resetField("password") : navigate("/dashboard");
   };
 
+  const username = useSelector((state) => state.user.username);
+
   // return () {}
+  if (username) return <Navigate to="/dashboard" />;
   return (
     <Container maxWidth="xs">
       <Box mt={8} display="flex" flexDirection="column" alignItems="center">

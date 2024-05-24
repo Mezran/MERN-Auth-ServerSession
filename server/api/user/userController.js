@@ -49,7 +49,6 @@ export const userLogout = asyncHandler(async (req, res) => {
 
 // GET /api/user
 export const userSession = asyncHandler(async (req, res) => {
-  console.log("session", req.session);
   const { user } = req.session;
   if (!user) throw { code: 200, message: "Unauthorized", error: "You must log in first" };
 

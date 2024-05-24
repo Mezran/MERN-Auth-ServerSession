@@ -4,9 +4,10 @@ import { Container, Box, Avatar, Typography, Button, Link, Grid } from "@mui/mat
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 // React Router Dom
-import { Link as RRDLink, useNavigate } from "react-router-dom";
+import { Link as RRDLink, useNavigate, Navigate } from "react-router-dom";
 
 // Redux
+import { useSelector } from "react-redux";
 import { useUserRegisterMutation } from "../../../redux/user/userApiSlice";
 
 // React Hook Form, yup, resolver, and devtool
@@ -57,8 +58,10 @@ const PageUserRegister = () => {
       ? (resetField("password"), resetField("passwordConfirm"))
       : navigate("/dashboard");
   };
+  const username = useSelector((state) => state.user.username);
 
   // return () {}
+  if (username) return <Navigate to="/dashboard" />;
   return (
     <Container maxWidth="xs">
       <Box mt={8} display="flex" flexDirection="column" alignItems="center">
