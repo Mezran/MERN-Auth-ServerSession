@@ -12,8 +12,8 @@ import { useUserGetSessionQuery } from "../../redux/user/userApiSlice";
 // const FileName
 const ProtectedPage = () => {
   // Redux
-  const { isLoading, isFetching } = useUserGetSessionQuery();
   const username = useSelector((state) => state.user.username);
+  const { isLoading, isFetching } = useUserGetSessionQuery();
 
   // return () {}
   if (isLoading || isFetching) return <Box>Loading...</Box>;

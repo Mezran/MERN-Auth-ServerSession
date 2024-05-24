@@ -32,7 +32,7 @@ const Header = () => {
   const navigate = useNavigate();
   // Redux
   const username = useSelector((state) => state.user.username);
-  const { isLoading, isFetching } = useUserGetSessionQuery({ skip: username == null });
+  const { isLoading, isFetching } = useUserGetSessionQuery();
   const [userLogout] = useUserLogoutMutation();
 
   // React Hook Form

@@ -37,7 +37,7 @@ export const userLogin = asyncHandler(async (req, res) => {
 export const userLogout = asyncHandler(async (req, res) => {
   const { user } = req.session;
 
-  if (!user) throw new Error("You are not logged in");
+  if (!user) throw { code: 200, message: "Unauthorized", error: "You must log in first" };
 
   req.session.destroy((err) => {
     if (err) throw err;
@@ -51,7 +51,7 @@ export const userLogout = asyncHandler(async (req, res) => {
 export const userSession = asyncHandler(async (req, res) => {
   console.log("session", req.session);
   const { user } = req.session;
-  if (!user) throw new Error("You are not logged in");
+  if (!user) throw { code: 200, message: "Unauthorized", error: "You must log in first" };
 
   const sessionUser = sessionizeUser(user);
   req.session.user = sessionUser;

@@ -36,6 +36,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const result = await queryFulfilled;
+          console.log(result.data);
           dispatch(setUser(result.data));
         } catch (error) {
           console.error(error);
@@ -52,7 +53,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const result = await queryFulfilled;
-          // dispatch(setUser(null));
+          dispatch(setUser({ username: null }));
           dispatch(apiSlice.util.resetApiState());
         } catch (error) {
           console.error(error);
@@ -72,8 +73,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const result = await queryFulfilled;
-          console.log(result);
-          dispatch(setUser(result.data));
+          dispatch(setUser(result.data.username ? result.data : { username: null }));
         } catch (error) {
           console.error(error);
         }

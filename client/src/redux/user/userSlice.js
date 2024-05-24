@@ -14,11 +14,14 @@ const userSlice = createSlice({
     setUser: (state, action) => {
       state.username = action.payload.username;
     },
+    setUserNull: (state) => {
+      state.username = null;
+    },
   },
 });
 
 // actions
-export const { setUser } = userSlice.actions;
+export const { setUser, setUserNull } = userSlice.actions;
 
 // reducer
 export default userSlice.reducer;
