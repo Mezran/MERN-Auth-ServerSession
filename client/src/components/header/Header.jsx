@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import PetsIcon from "@mui/icons-material/Pets";
 // React Router Dom
-import { Link as RRDLink, useNavigate } from "react-router-dom";
+import { Link as RRDLink } from "react-router-dom";
 // Redux
 import { useSelector } from "react-redux";
 import {
@@ -29,10 +29,8 @@ const Header = () => {
   // local state
   const [avatarAnchorElement, setAvatarAnchorElement] = useState(null);
   // React Router Dom
-  const navigate = useNavigate();
   // Redux
   const username = useSelector((state) => state.user.username);
-  const { isLoading, isFetching } = useUserGetSessionQuery();
   const [userLogout] = useUserLogoutMutation();
 
   // React Hook Form
@@ -52,7 +50,6 @@ const Header = () => {
   };
 
   // return () {}
-  if (isLoading || isFetching) return <Box>Loading...</Box>;
   return (
     <>
       <AppBar color="primary" position="fixed" elevation={4}>

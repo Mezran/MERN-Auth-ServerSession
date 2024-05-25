@@ -52,8 +52,8 @@ export const userApiSlice = apiSlice.injectEndpoints({
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const result = await queryFulfilled;
-          dispatch(setUser({ username: null }));
           dispatch(apiSlice.util.resetApiState());
+          dispatch(setUser({ username: null }));
         } catch (error) {
           console.error(error);
         }

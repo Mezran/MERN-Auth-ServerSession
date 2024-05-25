@@ -5,10 +5,11 @@ const asyncHandler = (fn) => (req, res, next) => {
     process.env.NODE_ENV !== "test" ? console.log(error) : null;
     // switch on error type pass in error.code
     switch (error.code) {
-      case 200:
-        return res
-          .status(error.code)
-          .json({ message: error.message, error: error.error });
+      case 401:
+        return res.status(error.code).json({
+          message: error.message || "Unauthorized",
+          error: error.message || "You must log in to access resource",
+        });
       default:
         return res
           .status(500)

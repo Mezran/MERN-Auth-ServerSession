@@ -30,6 +30,16 @@ export const userLogin = asyncHandler(async (req, res) => {
 
   const sessionUser = sessionizeUser(user);
   req.session.user = sessionUser;
+  res.send({ user: sessionUser, message: "Logged in" });
+});
+
+// GET /api/user
+export const userSession = asyncHandler(async (req, res) => {
+  const { user } = req.session;
+  if (!user) throw { code: 401 };
+
+  const sessionUser = sessionizeUser(user);
+  req.session.user = sessionUser;
   res.send(sessionUser);
 });
 
@@ -37,7 +47,7 @@ export const userLogin = asyncHandler(async (req, res) => {
 export const userLogout = asyncHandler(async (req, res) => {
   const { user } = req.session;
 
-  if (!user) throw { code: 200, message: "Unauthorized", error: "You must log in first" };
+  if (!user) throw { code: 401 };
 
   req.session.destroy((err) => {
     if (err) throw err;
@@ -45,14 +55,4 @@ export const userLogout = asyncHandler(async (req, res) => {
     res.session = null;
     res.send(user);
   });
-});
-
-// GET /api/user
-export const userSession = asyncHandler(async (req, res) => {
-  const { user } = req.session;
-  if (!user) throw { code: 200, message: "Unauthorized", error: "You must log in first" };
-
-  const sessionUser = sessionizeUser(user);
-  req.session.user = sessionUser;
-  res.send(sessionUser);
 });

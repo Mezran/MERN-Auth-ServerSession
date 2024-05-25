@@ -17,6 +17,7 @@ import { Provider } from "react-redux";
 import store from "./redux/store";
 import ProtectedPage from "./components/protectedPage/ProtectedPage";
 import PageUserLogin from "./pages/user/login/PageUserLogin";
+import Popup from "./components/popup/Popup";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
               </Route>
               <Route path="/*" element={<h1>Not Found</h1>} />
             </Routes>
+            <Popup />
           </ThemeProvider>
         </BrowserRouter>
       </Provider>
