@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   open: false,
-  message: "",
+  messages: [],
   severity: "info",
 };
 
@@ -12,7 +12,7 @@ const popupSlice = createSlice({
   reducers: {
     setPopupState: (state, action) => {
       state.open = action.payload.open;
-      state.message = action.payload.message;
+      state.messages = action.payload.messages;
       state.severity = action.payload.severity;
     },
     setPopupStateHidden: (state) => {

@@ -16,7 +16,7 @@ export const userRegister = asyncHandler(async (req, res) => {
 
   const sessionUser = sessionizeUser(newUser);
   req.session.user = sessionUser;
-  res.send(sessionUser);
+  res.send({ user: sessionUser, message: "User registered" });
 });
 
 // POST /api/user/login
@@ -26,7 +26,8 @@ export const userLogin = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ email });
   if (!user) throw new Error("User not found");
-  if (!user.comparePasswords(password)) throw new Error("Password incorrect");
+  if (!user.comparePasswords(password))
+    throw { type: "error", code: 401, message: "Invalid login credentials" };
 
   const sessionUser = sessionizeUser(user);
   req.session.user = sessionUser;
@@ -36,11 +37,11 @@ export const userLogin = asyncHandler(async (req, res) => {
 // GET /api/user
 export const userSession = asyncHandler(async (req, res) => {
   const { user } = req.session;
-  if (!user) throw { code: 401 };
+  if (!user) return res.send({ user: null });
 
   const sessionUser = sessionizeUser(user);
   req.session.user = sessionUser;
-  res.send(sessionUser);
+  res.send({ user: sessionUser });
 });
 
 // DELETE /api/user/logout
@@ -53,6 +54,6 @@ export const userLogout = asyncHandler(async (req, res) => {
     if (err) throw err;
     res.clearCookie(process.env.SESS_NAME);
     res.session = null;
-    res.send(user);
+    res.send({ user: null, message: "Logged out" });
   });
 });

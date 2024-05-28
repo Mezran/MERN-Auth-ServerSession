@@ -30,7 +30,9 @@ const Popup = () => {
     >
       <Alert onClose={handleOnClose} severity={popupState.severity}>
         <AlertTitle>{capitalize(popupState.severity)}</AlertTitle>
-        {popupState.message}
+        {popupState.messages.map((message, index) => (
+          <div key={index}>{message}</div>
+        ))}
       </Alert>
     </Snackbar>
   );

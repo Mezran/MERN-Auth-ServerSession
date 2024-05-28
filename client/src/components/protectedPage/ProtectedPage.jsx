@@ -12,12 +12,12 @@ import { useUserGetSessionQuery } from "../../redux/user/userApiSlice";
 // const FileName
 const ProtectedPage = () => {
   // Redux
-  const username = useSelector((state) => state.user.username);
+  const user = useSelector((state) => state.user.user);
   const { isLoading, isFetching } = useUserGetSessionQuery();
 
   // return () {}
   if (isLoading || isFetching) return <Box>Loading...</Box>;
-  return username ? <Outlet /> : <Navigate to="/user/login" />;
+  return user != null ? <Outlet /> : <Navigate to="/user/login" />;
 };
 // export default
 export default ProtectedPage;

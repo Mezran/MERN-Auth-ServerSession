@@ -58,10 +58,10 @@ const PageUserRegister = () => {
       ? (resetField("password"), resetField("passwordConfirm"))
       : navigate("/dashboard");
   };
-  const username = useSelector((state) => state.user.username);
+  const user = useSelector((state) => state.user.user);
 
   // return () {}
-  if (username) return <Navigate to="/dashboard" />;
+  if (user != null) return <Navigate to="/dashboard" />;
   return (
     <Container maxWidth="xs">
       <Box mt={8} display="flex" flexDirection="column" alignItems="center">

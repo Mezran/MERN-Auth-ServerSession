@@ -2,13 +2,16 @@ import { parseError } from "./helpers.js";
 
 const asyncHandler = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch((error) => {
-    process.env.NODE_ENV !== "test" ? console.log(error) : null;
+    // process.env.NODE_ENV !== "test" ? console.log(error) : null;
+
+    console.log(error.name);
+
     // switch on error type pass in error.code
-    switch (error.code) {
-      case 401:
-        return res.status(error.code).json({
-          message: error.message || "Unauthorized",
-          error: error.message || "You must log in to access resource",
+    switch (error.name) {
+      case "ValidationError":
+        return res.status(error.code || 400).json({
+          severity: error.severity || "error",
+          messages: Object.values(error.errors).map((el) => el.message) || ["error"],
         });
       default:
         return res

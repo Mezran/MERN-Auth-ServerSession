@@ -30,7 +30,9 @@ const Header = () => {
   const [avatarAnchorElement, setAvatarAnchorElement] = useState(null);
   // React Router Dom
   // Redux
-  const username = useSelector((state) => state.user.username);
+  const { isLoading, isFetching } = useUserGetSessionQuery();
+  const user = useSelector((state) => state.user.user);
+
   const [userLogout] = useUserLogoutMutation();
 
   // React Hook Form
@@ -44,12 +46,13 @@ const Header = () => {
   const handleAvatarOnClose = () => {
     setAvatarAnchorElement(null);
   };
-  const handleLogoutOnClick = () => {
+  const handleLogoutOnClick = async () => {
     handleAvatarOnClose();
     userLogout();
   };
 
   // return () {}
+  if (isLoading || isFetching) return <Box>Loading...</Box>;
   return (
     <>
       <AppBar color="primary" position="fixed" elevation={4}>
@@ -74,7 +77,7 @@ const Header = () => {
             <Grid item>
               {/* Dashboard Button */}
               {/* if user is logged in, show the dashboard button */}
-              {username != null && (
+              {user != null && (
                 <Button component={RRDLink} to={"/dashboard"} sx={{ color: "white" }}>
                   Dashboard
                 </Button>
@@ -86,9 +89,9 @@ const Header = () => {
             {/* User button */}
             <Grid item>
               {/* if user is logged in, show the logout button */}
-              {username != null ? (
+              {user != null ? (
                 <Button onClick={handleAvatarOnClick}>
-                  <Avatar>{username.at(0).toUpperCase()}</Avatar>
+                  <Avatar>{user.username.at(0).toUpperCase()}</Avatar>
                 </Button>
               ) : (
                 <Button component={RRDLink} to={"/user/login"} sx={{ color: "white" }}>
