@@ -25,9 +25,13 @@ export const userLogin = asyncHandler(async (req, res) => {
   await signIn.validateAsync({ email, password });
 
   const user = await User.findOne({ email });
-  if (!user) throw new Error("User not found");
-  if (!user.comparePasswords(password))
-    throw { type: "error", code: 401, message: "Invalid login credentials" };
+  if (!user || !user.comparePasswords(password))
+    throw {
+      name: "UserError",
+      code: 401,
+      severity: "error",
+      message: "Invalid login credentials",
+    };
 
   const sessionUser = sessionizeUser(user);
   req.session.user = sessionUser;
@@ -48,7 +52,8 @@ export const userSession = asyncHandler(async (req, res) => {
 export const userLogout = asyncHandler(async (req, res) => {
   const { user } = req.session;
 
-  if (!user) throw { code: 401 };
+  if (!user)
+    throw { name: "UserError", code: 401, severity: "error", message: "Unauthorized" };
 
   req.session.destroy((err) => {
     if (err) throw err;
