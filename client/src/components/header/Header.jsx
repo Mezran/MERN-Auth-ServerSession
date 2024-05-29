@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import PetsIcon from "@mui/icons-material/Pets";
 // React Router Dom
-import { Link as RRDLink } from "react-router-dom";
+import { Link as RRDLink, useNavigate } from "react-router-dom";
 // Redux
 import { useSelector } from "react-redux";
 import {
@@ -29,6 +29,7 @@ const Header = () => {
   // local state
   const [avatarAnchorElement, setAvatarAnchorElement] = useState(null);
   // React Router Dom
+  const navigate = useNavigate();
   // Redux
   const { isLoading, isFetching } = useUserGetSessionQuery();
   const user = useSelector((state) => state.user.user);
@@ -45,6 +46,10 @@ const Header = () => {
   };
   const handleAvatarOnClose = () => {
     setAvatarAnchorElement(null);
+  };
+  const handleProfileOnClick = () => {
+    handleAvatarOnClose();
+    navigate("/user/profile");
   };
   const handleLogoutOnClick = async () => {
     handleAvatarOnClose();
@@ -107,7 +112,7 @@ const Header = () => {
           open={Boolean(avatarAnchorElement)}
           onClose={handleAvatarOnClose}
         >
-          <MenuItem onClick={null}>Profile</MenuItem>
+          <MenuItem onClick={handleProfileOnClick}>Profile</MenuItem>
 
           <MenuItem onClick={handleLogoutOnClick}>Logout</MenuItem>
         </Menu>

@@ -17,6 +17,7 @@ import { Provider } from "react-redux";
 import store from "./redux/store";
 import ProtectedPage from "./components/protectedPage/ProtectedPage";
 import PageUserLogin from "./pages/user/login/PageUserLogin";
+import PageUserProfile from "./pages/user/profile/PageUserProfile";
 import Popup from "./components/popup/Popup";
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
               <Route path="/user/login" element={<PageUserLogin />} />
               <Route element={<ProtectedPage />}>
                 <Route path="/dashboard" element={<h1>Dashboard Page</h1>} />
+                <Route path="/user/profile" element={<PageUserProfile />} />
               </Route>
               <Route path="/*" element={<h1>Not Found</h1>} />
             </Routes>
