@@ -3,7 +3,7 @@ import { setPopupState } from "./popup/popupSlice";
 
 export const rtkMessageDisplayMiddleware = (api) => (next) => (action) => {
   console.log("action", action.payload);
-  if (action.type.includes("rejected") && action.payload.data.messages.length > 0) {
+  if (action.type.includes("rejected") && action.payload.data.messages) {
     api.dispatch(
       setPopupState({
         open: true,

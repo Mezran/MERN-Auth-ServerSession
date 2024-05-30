@@ -1,9 +1,14 @@
 import { parseError } from "./helpers.js";
 
+// * asyncHandler
+// * @res.status returns:
+// * - error.code -- integer
+// * - error.severity -- string
+// * - error.messages -- [string]
 const asyncHandler = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch((error) => {
     // process.env.NODE_ENV !== "test" ? console.log(error) : null;
-
+    console.log(error);
     // switch on error type pass in error.code
     switch (error.name) {
       case "ValidationError":
@@ -19,6 +24,11 @@ const asyncHandler = (fn) => (req, res, next) => {
           severity: error.severity || "error",
           messages: errorList,
         });
+      case "AuthError":
+        return res.status(error.code || 401).json({
+          severity: error.severity || "error",
+          messages: error.messages,
+        });
       case "UserError":
         return res.status(error.code || 400).json({
           severity: error.severity || "error",
@@ -27,7 +37,7 @@ const asyncHandler = (fn) => (req, res, next) => {
       default:
         return res
           .status(500)
-          .json({ message: "Server error", error: parseError(error) });
+          .json({ messages: ["Server error"], error: parseError(error) });
     }
   });
 };

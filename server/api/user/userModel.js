@@ -31,6 +31,12 @@ UserSchema.pre("save", function () {
     this.password = hashSync(this.password, 10);
   }
 });
+// pre update hook to hash password
+UserSchema.pre("findOneAndUpdate", function () {
+  if (this.getUpdate().password) {
+    this.getUpdate().password = hashSync(this.getUpdate().password, 10);
+  }
+});
 UserSchema.statics.doesNotExist = async function (field) {
   return (await this.where(field).countDocuments()) === 0;
 };

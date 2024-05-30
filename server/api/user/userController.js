@@ -1,8 +1,7 @@
 // imports
 import asyncHandler from "../../utils/asyncHandler.js";
 import User from "./userModel.js";
-import Joi from "joi";
-import { signUp, signIn } from "./userValidation.js";
+import { signUp, signIn, updateUser } from "./userValidation.js";
 import { sessionizeUser } from "../../utils/helpers.js";
 
 // POST /api/user/register
@@ -16,7 +15,7 @@ export const userRegister = asyncHandler(async (req, res) => {
 
   const sessionUser = sessionizeUser(newUser);
   req.session.user = sessionUser;
-  res.send({ user: sessionUser, message: "User registered" });
+  res.send({ user: sessionUser, messages: ["User registered"] });
 });
 
 // POST /api/user/login
@@ -30,12 +29,12 @@ export const userLogin = asyncHandler(async (req, res) => {
       name: "UserError",
       code: 401,
       severity: "error",
-      message: "Invalid login credentials",
+      messages: ["Invalid login credentials"],
     };
 
   const sessionUser = sessionizeUser(user);
   req.session.user = sessionUser;
-  res.send({ user: sessionUser, message: "Logged in" });
+  res.send({ user: sessionUser, messages: ["Logged in"] });
 });
 
 // GET /api/user
@@ -53,12 +52,36 @@ export const userLogout = asyncHandler(async (req, res) => {
   const { user } = req.session;
 
   if (!user)
-    throw { name: "UserError", code: 401, severity: "error", message: "Unauthorized" };
+    throw { name: "UserError", code: 401, severity: "error", messages: ["Unauthorized"] };
 
   req.session.destroy((err) => {
     if (err) throw err;
     res.clearCookie(process.env.SESS_NAME);
     res.session = null;
-    res.send({ user: null, message: "Logged out" });
+    res.send({ user: null, messages: ["Logged out"] });
   });
+});
+
+// UPDATE /api/user
+export const userUpdate = asyncHandler(async (req, res) => {
+  const { username, email, password, passwordCurrent } = req.body;
+  if (!req.user || !req.user.comparePasswords(passwordCurrent))
+    throw {
+      name: "UserError",
+      code: 401,
+      severity: "error",
+      messages: ["Unauthorized"],
+    };
+
+  await updateUser.validateAsync({ username, email, password, passwordCurrent });
+
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user._id,
+    { username, email, password },
+    { new: true }
+  );
+
+  const sessionUser = sessionizeUser(updatedUser);
+  req.session.user = sessionUser;
+  res.send({ user: sessionUser, messages: ["User updated"] });
 });
