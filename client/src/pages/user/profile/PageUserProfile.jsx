@@ -19,10 +19,7 @@ import {
 import { useNavigate } from "react-router-dom";
 
 // Redux
-// import {
-//   useUserUpdateMutation,
-//   useUserDeleteMutation,
-// } from "../../../redux/user/userApiSlice";
+import { useUserUpdateMutation } from "../../../redux/user/userApiSlice";
 import { useSelector } from "react-redux";
 
 // React Hook Form, yup, resolver, and devtool
@@ -45,7 +42,7 @@ const PageUserProfile = () => {
 
   // Redux
   const user = useSelector((state) => state.user);
-  //   const [userUpdate] = useUserUpdateMutation();
+  const [userUpdate] = useUserUpdateMutation();
   //   const [userDelete, { isError: isUserDeleteError }] = useUserDeleteMutation();
 
   // React Hook Form
@@ -57,7 +54,7 @@ const PageUserProfile = () => {
     password: yup
       .string()
       .notRequired()
-      .min(2)
+      .min(1)
       .max(32)
       .nullable()
       .transform((value) => (!!value ? value : null)),
@@ -109,7 +106,7 @@ const PageUserProfile = () => {
   };
 
   const onUpdateProfileDialogConfirmed = () => {
-    // userUpdate(getValues());
+    userUpdate(getValues());
     onUpdateProfileDialogClose();
   };
 
@@ -142,7 +139,9 @@ const PageUserProfile = () => {
           <Toolbar>
             <Grid container alignItems="center">
               <Grid item>
-                <Typography>Profile: {user.user.username}</Typography>
+                <Typography>
+                  Profile: {user.user.username} | Email: {user.user.email}
+                </Typography>
               </Grid>
               <Grid item xs />
               <Grid item>

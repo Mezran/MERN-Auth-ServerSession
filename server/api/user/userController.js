@@ -64,13 +64,17 @@ export const userLogout = asyncHandler(async (req, res) => {
 
 // UPDATE /api/user
 export const userUpdate = asyncHandler(async (req, res) => {
-  const { username, email, password, passwordCurrent } = req.body;
+  const username = req.body.username === "" ? undefined : req.body.username;
+  const email = req.body.email === "" ? undefined : req.body.email;
+  const password = req.body.password === "" ? undefined : req.body.password;
+  const passwordCurrent = req.body.passwordCurrent;
+
   if (!req.user || !req.user.comparePasswords(passwordCurrent))
     throw {
       name: "UserError",
       code: 401,
       severity: "error",
-      messages: ["Unauthorized"],
+      messages: ["Invalid current password"],
     };
 
   await updateUser.validateAsync({ username, email, password, passwordCurrent });

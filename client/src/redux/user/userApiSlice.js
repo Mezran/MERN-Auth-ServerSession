@@ -1,6 +1,5 @@
 // userApiSlice.js
 // imports
-import { userLogin, userLogout } from "../../../../server/api/user/userController";
 import { apiSlice } from "../apiSlice";
 import { URL_USER } from "../constants";
 import { setUser } from "./userSlice";
@@ -63,6 +62,21 @@ export const userApiSlice = apiSlice.injectEndpoints({
     // userGet
 
     // userUpdate
+    userUpdate: builder.mutation({
+      query: (body) => ({
+        url: `${URL_USER}/`,
+        method: "PATCH",
+        body,
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const result = await queryFulfilled;
+          dispatch(setUser(result.data));
+        } catch (error) {
+          console.error(error);
+        }
+      },
+    }), // end userUpdate
 
     // userDelete
 
@@ -86,4 +100,5 @@ export const {
   useUserLoginMutation,
   useUserLogoutMutation,
   useUserGetSessionQuery,
+  useUserUpdateMutation,
 } = userApiSlice;
