@@ -19,7 +19,10 @@ import {
 import { useNavigate } from "react-router-dom";
 
 // Redux
-import { useUserUpdateMutation } from "../../../redux/user/userApiSlice";
+import {
+  useUserUpdateMutation,
+  useUserDeleteMutation,
+} from "../../../redux/user/userApiSlice";
 import { useSelector } from "react-redux";
 
 // React Hook Form, yup, resolver, and devtool
@@ -43,7 +46,7 @@ const PageUserProfile = () => {
   // Redux
   const user = useSelector((state) => state.user);
   const [userUpdate] = useUserUpdateMutation();
-  //   const [userDelete, { isError: isUserDeleteError }] = useUserDeleteMutation();
+  const [userDelete, { isError: isUserDeleteError }] = useUserDeleteMutation();
 
   // React Hook Form
   // - schema
@@ -120,11 +123,11 @@ const PageUserProfile = () => {
   };
 
   const onDeleteProfileDialogConfirmed = async () => {
-    // await userDelete({ passwordCurrent: getValues("passwordCurrent") });
+    await userDelete({ passwordCurrent: getValues("passwordCurrent") });
     onDeleteProfileDialogClose();
-    // if (!isUserDeleteError) {
-    //   navigate("/user/login");
-    // }
+    if (!isUserDeleteError) {
+      navigate("/user/login");
+    }
   };
 
   // return () {}

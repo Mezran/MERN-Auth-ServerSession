@@ -89,3 +89,25 @@ export const userUpdate = asyncHandler(async (req, res) => {
   req.session.user = sessionUser;
   res.send({ user: sessionUser, messages: ["User updated"] });
 });
+
+// DELETE /api/user
+export const userDelete = asyncHandler(async (req, res) => {
+  const passwordCurrent = req.body.passwordCurrent;
+
+  if (!req.user || !req.user.comparePasswords(passwordCurrent))
+    throw {
+      name: "UserError",
+      code: 401,
+      severity: "error",
+      messages: ["Invalid current password"],
+    };
+
+  await User.findByIdAndDelete(req.user._id);
+
+  req.session.destroy((err) => {
+    if (err) throw err;
+    res.clearCookie(process.env.SESS_NAME);
+    res.session = null;
+    res.send({ user: null, messages: ["User deleted"] });
+  });
+});

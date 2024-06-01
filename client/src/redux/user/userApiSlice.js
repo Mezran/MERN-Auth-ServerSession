@@ -79,6 +79,22 @@ export const userApiSlice = apiSlice.injectEndpoints({
     }), // end userUpdate
 
     // userDelete
+    userDelete: builder.mutation({
+      query: (body) => ({
+        url: `${URL_USER}/`,
+        method: "DELETE",
+        body,
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const result = await queryFulfilled;
+          dispatch(apiSlice.util.resetApiState());
+          dispatch(setUser({ user: null }));
+        } catch (error) {
+          console.error(error);
+        }
+      },
+    }), // end userDelete
 
     // userGetSession
     userGetSession: builder.query({
@@ -101,4 +117,5 @@ export const {
   useUserLogoutMutation,
   useUserGetSessionQuery,
   useUserUpdateMutation,
+  useUserDeleteMutation,
 } = userApiSlice;

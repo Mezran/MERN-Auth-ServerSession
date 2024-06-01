@@ -6,6 +6,7 @@ import {
   userLogout,
   userSession,
   userUpdate,
+  userDelete,
 } from "./userController.js";
 
 const userRoutes = express.Router();
@@ -15,4 +16,5 @@ userRoutes.post("/login", userLogin);
 userRoutes.delete("/logout", userLogout);
 userRoutes.get("/session", userSession);
 userRoutes.patch("/", protectRoute, userUpdate);
+userRoutes.delete("/", protectRoute, userDelete);
 export default userRoutes;
