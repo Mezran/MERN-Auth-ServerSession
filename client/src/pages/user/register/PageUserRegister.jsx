@@ -14,7 +14,6 @@ import { useUserRegisterMutation } from "../../../redux/user/userApiSlice";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { DevTool } from "@hookform/devtools";
 
 // components
 import CTextField from "../../../components/customMUI/cTextField/CTextField";
@@ -108,7 +107,6 @@ const PageUserRegister = () => {
           </Grid>
         </Box>
       </Box>
-      <DevTool control={control} />
     </Container>
   );
 };

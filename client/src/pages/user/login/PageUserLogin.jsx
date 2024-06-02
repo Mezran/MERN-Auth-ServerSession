@@ -14,7 +14,6 @@ import { useUserLoginMutation } from "../../../redux/user/userApiSlice";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { DevTool } from "@hookform/devtools";
 
 // components
 import CTextField from "../../../components/customMUI/cTextField/CTextField";
@@ -93,7 +92,6 @@ const PageUserLogin = () => {
           </Grid>
         </Box>
       </Box>
-      <DevTool control={control} />
     </Container>
   );
 };

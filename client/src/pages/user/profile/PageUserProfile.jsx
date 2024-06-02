@@ -29,7 +29,6 @@ import { useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { DevTool } from "@hookform/devtools";
 
 // components
 import CTextField from "../../../components/customMUI/cTextField/CTextField";
@@ -264,7 +263,6 @@ const PageUserProfile = () => {
             </Button>
           </DialogActions>
         </Dialog>
-        <DevTool control={control} />
       </Box>
     </Container>
   );
