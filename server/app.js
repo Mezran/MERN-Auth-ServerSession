@@ -42,10 +42,12 @@ app.use(
 );
 
 // logging
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`);
-  next();
-});
+if (process.env.NODE_ENV !== "test") {
+  app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+  });
+}
 
 // routes
 app.use("/api/user", userRoutes);

@@ -7,8 +7,9 @@ import { parseError } from "./helpers.js";
 // * - error.messages -- [string]
 const asyncHandler = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch((error) => {
-    // process.env.NODE_ENV !== "test" ? console.log(error) : null;
-    console.log(error);
+    process.env.NODE_ENV !== "test" ? console.log(error) : null;
+
+    console.log("error.name", error);
     // switch on error type pass in error.code
     switch (error.name) {
       case "ValidationError":
