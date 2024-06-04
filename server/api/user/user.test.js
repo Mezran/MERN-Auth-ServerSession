@@ -21,7 +21,11 @@ describe("Server/api/user", () => {
       test("missing all fields: should return 400 and error", async () => {
         const res = await request(app).post("/api/user/register").send({});
         expect(res.status).toBe(400);
-        // expect(res.body.messages).toEqual(["email is required", "password is required"]);
+        expect(res.body.messages).toEqual([
+          "email is a required field",
+          "username is a required field",
+          "password is a required field",
+        ]);
         // console.log(res.body);
       });
     });

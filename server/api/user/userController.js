@@ -1,14 +1,22 @@
 // imports
 import asyncHandler from "../../utils/asyncHandler.js";
 import User from "./userModel.js";
-import { signUp, signIn, updateUser } from "./userValidation.js";
+import {
+  userRegisterSchema,
+  userLoginSchema,
+  userUpdateSchema,
+} from "./userValidation.js";
 import { sessionizeUser } from "../../utils/helpers.js";
 
 // POST /api/user/register
 export const userRegister = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
 
-  await signUp.validateAsync({ username, email, password });
+  // await signUp.validateAsync({ username, email, password });
+  const asd = await userRegisterSchema.validate(
+    { username, email, password },
+    { abortEarly: false }
+  );
 
   const newUser = new User({ username, email, password });
   await newUser.save();
@@ -21,7 +29,7 @@ export const userRegister = asyncHandler(async (req, res) => {
 // POST /api/user/login
 export const userLogin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  await signIn.validateAsync({ email, password });
+  await userLoginSchema.validate({ email, password });
 
   const user = await User.findOne({ email });
   if (!user || !user.comparePasswords(password))
@@ -77,7 +85,7 @@ export const userUpdate = asyncHandler(async (req, res) => {
       messages: ["Invalid current password"],
     };
 
-  await updateUser.validateAsync({ username, email, password, passwordCurrent });
+  await userUpdateSchema.validate({ email, username, password, passwordCurrent });
 
   const updatedUser = await User.findByIdAndUpdate(
     req.user._id,

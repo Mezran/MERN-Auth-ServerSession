@@ -1,32 +1,19 @@
-import Joi from "joi";
-const email = Joi.string().email({ tlds: { allow: false } });
-const username = Joi.string().alphanum().min(1).max(30);
-const message =
-  "must be between 1-32 characters, " +
-  "have at least one capital letter, " +
-  "one lowercase letter, one digit, " +
-  "and one special character";
-const password = Joi.string()
-  .min(1)
-  .max(32)
-  // regex for at least one lower case letter
-  .pattern(new RegExp("^(?=.*[a-z])"))
-  // regex for at least one capital letter, one lowercase letter, one digit, and one special character
-  //   .pattern(new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*])"))
+// user validation using yup
+import * as yup from "yup";
+export const userRegisterSchema = yup.object().shape({
+  email: yup.string().email().required(),
+  username: yup.string().required(),
+  password: yup.string().required(),
+});
 
-  .message(message);
-export const signUp = Joi.object().keys({
-  email: email.required(),
-  username: username.required(),
-  password: password.required(),
+export const userLoginSchema = yup.object().shape({
+  email: yup.string().email().required(),
+  password: yup.string().required(),
 });
-export const signIn = Joi.object().keys({
-  email: email.required(),
-  password: password.required(),
-});
-export const updateUser = Joi.object().keys({
-  email: email.optional(),
-  username: username.optional(),
-  password: password.optional(),
-  passwordCurrent: password.required(),
+
+export const userUpdateSchema = yup.object().shape({
+  email: yup.string().email().optional(),
+  username: yup.string().optional(),
+  password: yup.string().optional(),
+  passwordCurrent: yup.string().required(),
 });
