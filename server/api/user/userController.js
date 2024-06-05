@@ -5,6 +5,7 @@ import {
   userRegisterSchema,
   userLoginSchema,
   userUpdateSchema,
+  userDeleteSchema,
 } from "./userValidation.js";
 import { sessionizeUser } from "../../utils/helpers.js";
 
@@ -72,10 +73,19 @@ export const userLogout = asyncHandler(async (req, res) => {
 
 // UPDATE /api/user
 export const userUpdate = asyncHandler(async (req, res) => {
-  const username = req.body.username === "" ? undefined : req.body.username;
-  const email = req.body.email === "" ? undefined : req.body.email;
-  const password = req.body.password === "" ? undefined : req.body.password;
-  const passwordCurrent = req.body.passwordCurrent;
+  const { username, email, password, passwordCurrent } = req.body;
+  if (username == undefined && email == undefined && password == undefined)
+    throw {
+      name: "InfoError",
+      code: 400,
+      severity: "info",
+      messages: ["No changes submitted"],
+    };
+
+  await userUpdateSchema.validate(
+    { email, username, password, passwordCurrent },
+    { abortEarly: false }
+  );
 
   if (!req.user || !req.user.comparePasswords(passwordCurrent))
     throw {
@@ -84,11 +94,6 @@ export const userUpdate = asyncHandler(async (req, res) => {
       severity: "error",
       messages: ["Invalid current password"],
     };
-
-  await userUpdateSchema.validate(
-    { email, username, password, passwordCurrent },
-    { abortEarly: false }
-  );
 
   const updatedUser = await User.findByIdAndUpdate(
     req.user._id,
@@ -103,7 +108,9 @@ export const userUpdate = asyncHandler(async (req, res) => {
 
 // DELETE /api/user
 export const userDelete = asyncHandler(async (req, res) => {
-  const passwordCurrent = req.body.passwordCurrent;
+  const { passwordCurrent } = req.body;
+
+  await userDeleteSchema.validate({ passwordCurrent }, { abortEarly: false });
 
   if (!req.user || !req.user.comparePasswords(passwordCurrent))
     throw {

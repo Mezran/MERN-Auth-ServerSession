@@ -11,6 +11,7 @@ const asyncHandler = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch((error) => {
     process.env.NODE_ENV !== "test" ? console.log(error) : null;
 
+    // console.log(error);
     // ! ---- Mongoose Error ----
     if (
       error instanceof mongoose.Error.ValidationError ||
@@ -38,6 +39,13 @@ const asyncHandler = (fn) => (req, res, next) => {
     } else if (error.name === "UserError") {
       return res.status(error.code || 400).json({
         severity: error.severity || "error",
+        messages: error.messages,
+      });
+    }
+    // ! ---- Info Error ----
+    else if (error.name === "InfoError") {
+      return res.status(error.code || 400).json({
+        severity: error.severity || "info",
         messages: error.messages,
       });
     }

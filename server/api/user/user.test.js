@@ -257,41 +257,187 @@ describe("Server/api/user", () => {
   }); // end DELETE /api/user/logout
 
   // ! PATCH /api/user (userUpdate)
-  // describe("PATCH /api/user", () => {
-  //   const userUpdateModel = {
-  //     username: "userUpdateTest",
-  //     email: "userUpdateTest@t.t",
-  //     password: "userUpdateTest",
-  //   };
-  //   let cookie;
-  //   beforeAll(async () => {
-  //     // add user to db
-  //     const newUser = new User(userUpdateModel);
-  //     await newUser.save();
-  //     // get session cookie
-  //     const res = await request(app).post("/api/user/login").send({
-  //       email: userUpdateModel.email,
-  //       password: userUpdateModel.password,
-  //     });
-  //     cookie = res.headers["set-cookie"];
-  //   });
-  //   afterAll(async () => {
-  // // drop collection session if there is a session collection to drop
-  // if (mongoose.connection.db.collection("session")) {
-  //   await mongoose.connection.db.collection("session").drop();
-  // }
-  //   });
-  //   describe("invalid data", () => {
-  //     test("no session: should return 401 and error", async () => {
-  //       const res = await request(app).patch("/api/user/").send({});
-  //       expect(res.status).toBe(401);
-  //       expect(res.body.messages).toEqual(["Unauthorized"]);
-  //     }); // end no session
-  //     // test("missing all fields: should return 400 and error", async () => {
-  //     //   const res = await request(app).patch("/api/user").set("cookie", cookie).send({});
-  //     //   expect(res.status).toBe(400);
-  //     //   expect(res.body.messages).toEqual(["No changes submitted"]);
-  //     // }); // end missing all fields
-  //   }); // end invalid data
-  // }); // end PATCH /api/user
+  describe("PATCH /api/user", () => {
+    const userUpdateModel = {
+      username: "userUpdateTest",
+      email: "userUpdateTest@t.t",
+      password: "userUpdateTest",
+    };
+    const userUpdateModel1 = {
+      username: "userUpdateTest1",
+      email: "userUpdateTest1@t.t",
+      password: "userUpdateTest1",
+    };
+    const userUpdateModel2 = {
+      username: "userUpdateTest2",
+      email: "userUpdateTest2@t.t",
+      password: "userUpdateTest2",
+    };
+    let cookie;
+    beforeAll(async () => {
+      // add user to db
+      const newUser = new User(userUpdateModel);
+      await newUser.save();
+      // get session cookie
+      const res = await request(app).post("/api/user/login").send({
+        email: userUpdateModel.email,
+        password: userUpdateModel.password,
+      });
+      cookie = res.headers["set-cookie"];
+    });
+    afterAll(async () => {
+      // drop session collection if it exists
+      const collections = await mongoose.connection.db.listCollections().toArray();
+      const sessionCollectionExists = collections.some(
+        (collection) => collection.name === "session"
+      );
+
+      if (sessionCollectionExists) {
+        await mongoose.connection.db.collection("session").drop();
+      }
+    });
+    describe("invalid data", () => {
+      test("no session: should return 401 and error", async () => {
+        const res = await request(app).patch("/api/user/").send({});
+        expect(res.status).toBe(401);
+        expect(res.body.messages).toEqual(["Unauthorized to access resource"]);
+      }); // end no session
+      test("missing all fields: should return 400 and error", async () => {
+        const res = await request(app).patch("/api/user").set("cookie", cookie).send({});
+        expect(res.status).toBe(400);
+        expect(res.body.messages).toEqual(["No changes submitted"]);
+      }); // end missing all fields
+      test("missing passwordCurrent: should return 400 and error", async () => {
+        const res = await request(app).patch("/api/user").set("cookie", cookie).send({
+          username: userUpdateModel1.username,
+          email: userUpdateModel1.email,
+          password: userUpdateModel1.password,
+        });
+        expect(res.status).toBe(400);
+        expect(res.body.messages).toEqual(["Current password is required"]);
+      }); // end missing passwordCurrent
+    }); // end invalid data
+    describe("valid data", () => {
+      test("all valid fields: should return 200 and success message", async () => {
+        const res = await request(app).patch("/api/user").set("cookie", cookie).send({
+          username: userUpdateModel1.username,
+          email: userUpdateModel1.email,
+          password: userUpdateModel1.password,
+          passwordCurrent: userUpdateModel.password,
+        });
+        expect(res.status).toBe(200);
+        expect(res.body.messages).toEqual(["User updated"]);
+        // validate user update
+        const updatedUser = await User.findOne({
+          email: userUpdateModel1.email,
+        });
+        expect(updatedUser.username).toBe(userUpdateModel1.username);
+        expect(updatedUser.email).toBe(userUpdateModel1.email);
+        expect(updatedUser.comparePasswords(userUpdateModel1.password)).toBe(true);
+      }); // end all valid fields
+      test("valid email only: should return 200 and success message", async () => {
+        const res = await request(app).patch("/api/user").set("cookie", cookie).send({
+          email: userUpdateModel2.email,
+          passwordCurrent: userUpdateModel1.password,
+        });
+        expect(res.status).toBe(200);
+        expect(res.body.messages).toEqual(["User updated"]);
+        // validate user update
+        const updatedUser = await User.findOne({
+          email: userUpdateModel2.email,
+        });
+        expect(updatedUser.username).toBe(userUpdateModel1.username);
+        expect(updatedUser.email).toBe(userUpdateModel2.email);
+        expect(updatedUser.comparePasswords(userUpdateModel1.password)).toBe(true);
+      }); // end valid email only
+      test("valid username only: should return 200 and success message", async () => {
+        const res = await request(app).patch("/api/user").set("cookie", cookie).send({
+          username: userUpdateModel2.username,
+          passwordCurrent: userUpdateModel1.password,
+        });
+        expect(res.status).toBe(200);
+        expect(res.body.messages).toEqual(["User updated"]);
+        // validate user update
+        const updatedUser = await User.findOne({
+          email: userUpdateModel2.email,
+        });
+        expect(updatedUser.username).toBe(userUpdateModel2.username);
+        expect(updatedUser.email).toBe(userUpdateModel2.email);
+        expect(updatedUser.comparePasswords(userUpdateModel1.password)).toBe(true);
+      }); // end valid username only
+      test("valid password only: should return 200 and success message", async () => {
+        const res = await request(app).patch("/api/user").set("cookie", cookie).send({
+          password: userUpdateModel2.password,
+          passwordCurrent: userUpdateModel1.password,
+        });
+        expect(res.status).toBe(200);
+        expect(res.body.messages).toEqual(["User updated"]);
+        // validate user update
+        const updatedUser = await User.findOne({
+          email: userUpdateModel2.email,
+        });
+        expect(updatedUser.username).toBe(userUpdateModel2.username);
+        expect(updatedUser.email).toBe(userUpdateModel2.email);
+        expect(updatedUser.comparePasswords(userUpdateModel2.password)).toBe(true);
+      }); // end valid password only
+    }); // end valid data
+  }); // end PATCH /api/user
+
+  // ! DELETE /api/user (userDelete)
+  describe("DELETE /api/user", () => {
+    const userDeleteModel = {
+      username: "userDeleteTest",
+      email: "userDeleteTest@t.t",
+      password: "userDeleteTest",
+    };
+    let cookie;
+    beforeAll(async () => {
+      // add user to db
+      const newUser = new User(userDeleteModel);
+      await newUser.save();
+      // get session cookie
+      const res = await request(app).post("/api/user/login").send({
+        email: userDeleteModel.email,
+        password: userDeleteModel.password,
+      });
+      cookie = res.headers["set-cookie"];
+    });
+    afterAll(async () => {
+      // drop session collection if it exists
+      const collections = await mongoose.connection.db.listCollections().toArray();
+      const sessionCollectionExists = collections.some(
+        (collection) => collection.name === "session"
+      );
+
+      if (sessionCollectionExists) {
+        await mongoose.connection.db.collection("session").drop();
+      }
+    });
+    describe("invalid data", () => {
+      test("no session: should return 401 and error", async () => {
+        const res = await request(app).delete("/api/user");
+        expect(res.status).toBe(401);
+        expect(res.body.messages).toEqual(["Unauthorized to access resource"]);
+      }); // end no session
+      test("missing passwordCurrent: should return 400 and error", async () => {
+        const res = await request(app).delete("/api/user").set("cookie", cookie).send({});
+        expect(res.status).toBe(400);
+        expect(res.body.messages).toEqual(["Current password is required"]);
+      }); // end missing passwordCurrent
+    }); // end invalid data
+    describe("valid data", () => {
+      test("all valid fields: should return 200 and success message", async () => {
+        const res = await request(app).delete("/api/user").set("cookie", cookie).send({
+          passwordCurrent: userDeleteModel.password,
+        });
+        expect(res.status).toBe(200);
+        expect(res.body.messages).toEqual(["User deleted"]);
+        // validate user delete
+        const deletedUser = await User.findOne({
+          email: userDeleteModel.email,
+        });
+        expect(deletedUser).toBeNull();
+      }); // end all valid fields
+    }); // end valid data
+  }); // end DELETE /api/user
 });

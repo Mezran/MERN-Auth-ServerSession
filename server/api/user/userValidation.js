@@ -15,5 +15,9 @@ export const userUpdateSchema = yup.object().shape({
   email: yup.string().email().optional(),
   username: yup.string().optional(),
   password: yup.string().optional(),
-  passwordCurrent: yup.string().required(),
+  passwordCurrent: yup.string().required("Current password is required"),
+});
+
+export const userDeleteSchema = yup.object().shape({
+  passwordCurrent: yup.string().required("Current password is required"),
 });
