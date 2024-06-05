@@ -29,7 +29,7 @@ export const userRegister = asyncHandler(async (req, res) => {
 // POST /api/user/login
 export const userLogin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  await userLoginSchema.validate({ email, password });
+  await userLoginSchema.validate({ email, password }, { abortEarly: false });
 
   const user = await User.findOne({ email });
   if (!user || !user.comparePasswords(password))
@@ -45,7 +45,7 @@ export const userLogin = asyncHandler(async (req, res) => {
   res.send({ user: sessionUser, messages: ["Logged in"] });
 });
 
-// GET /api/user
+// GET /api/user/session
 export const userSession = asyncHandler(async (req, res) => {
   const { user } = req.session;
   if (!user) return res.send({ user: null });
@@ -85,7 +85,10 @@ export const userUpdate = asyncHandler(async (req, res) => {
       messages: ["Invalid current password"],
     };
 
-  await userUpdateSchema.validate({ email, username, password, passwordCurrent });
+  await userUpdateSchema.validate(
+    { email, username, password, passwordCurrent },
+    { abortEarly: false }
+  );
 
   const updatedUser = await User.findByIdAndUpdate(
     req.user._id,
