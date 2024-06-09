@@ -5,8 +5,12 @@ dotenv.config();
 import session from "express-session";
 import connectStore from "connect-mongo";
 
+// logging
+import logger from "./logger.js";
+
 // import routes
 import userRoutes from "./api/user/userRoutes.js";
+import testRoutes from "./api/test/testRoutes.js";
 
 // app config
 const app = express();
@@ -44,12 +48,13 @@ app.use(
 // logging
 if (process.env.NODE_ENV !== "test") {
   app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
+    logger.http(`${req.method} ${req.url}`);
     next();
   });
 }
 
 // routes
 app.use("/api/user", userRoutes);
+app.use("/api/test", testRoutes);
 
 export default app;

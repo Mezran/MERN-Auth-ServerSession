@@ -6,10 +6,13 @@
 import mongoose from "mongoose";
 import yup from "yup";
 
+// logger
+import logger from "../logger.js";
+
 // * - error.messages -- [string]
 const asyncHandler = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch((error) => {
-    process.env.NODE_ENV !== "test" ? console.log(error) : null;
+    process.env.NODE_ENV !== "test" ? logger.error("Async handler error: ", error) : null;
 
     // console.log(error);
     // ! ---- Mongoose Error ----
