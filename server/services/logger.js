@@ -1,10 +1,19 @@
+console.log("logger.js");
 import winston, { format } from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
+import "winston-mongodb";
+
+// import dotenv from "dotenv";
+// dotenv.config();
+
+console.log("MONGODB_URI: ", process.env.MONGODB_URI);
 
 // logger levels:
 // error: 0, warn: 1, info: 2, http: 3, verbose: 4, debug: 5, silly: 6
 
-const TwoDayTransport = new DailyRotateFile({
+const consoleTransport = new winston.transports.Console();
+
+const fileTransport = new DailyRotateFile({
   level: "verbose",
   filename: "./logs/%DATE%-two-days.log",
   datePattern: "YYYY-MM-DD",
@@ -12,6 +21,13 @@ const TwoDayTransport = new DailyRotateFile({
   maxSize: "20m",
   maxFiles: "2d",
 });
+
+const mongoDBOptions = {
+  db: process.env.MONGODB_URI,
+  options: { useUnifiedTopology: true },
+  collection: "logs",
+  level: "verbose",
+};
 
 const logger = winston.createLogger({
   level: "verbose",
@@ -25,7 +41,11 @@ const logger = winston.createLogger({
       return `${timestamp} ${level}: ${message} :: ${stack || ""}`;
     })
   ),
-  transports: [new winston.transports.Console(), TwoDayTransport],
+  transports: [
+    consoleTransport,
+    fileTransport,
+    // new winston.transports.MongoDB(mongoDBOptions),
+  ],
 });
 
 export default logger;

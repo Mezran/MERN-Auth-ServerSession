@@ -2,12 +2,12 @@
 // * @res.status returns:
 // * - error.code -- integer
 // * - error.severity -- string
-
+console.log("asyncHandler.js");
 import mongoose from "mongoose";
 import yup from "yup";
 
 // logger
-import logger from "../logger.js";
+import logger from "../services/logger.js";
 
 // * - error.messages -- [string]
 const asyncHandler = (fn) => (req, res, next) => {

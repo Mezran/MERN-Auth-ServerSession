@@ -1,9 +1,10 @@
+console.log("server.js");
 // server.js
-// imports
-import mongoose from "mongoose";
-
 // import files
 import app from "./app.js";
+
+// imports
+import mongoose from "mongoose";
 
 // app config
 const PORT = process.env.PORT || 9876;

@@ -1,12 +1,13 @@
-import express from "express";
-import cors from "cors";
+console.log("app.js");
 import dotenv from "dotenv";
 dotenv.config();
+import express from "express";
+import cors from "cors";
 import session from "express-session";
 import connectStore from "connect-mongo";
 
 // logging
-import logger from "./logger.js";
+import logger from "./services/logger.js";
 
 // import routes
 import userRoutes from "./api/user/userRoutes.js";
