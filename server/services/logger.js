@@ -1,12 +1,6 @@
-console.log("logger.js");
 import winston, { format } from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
 import "winston-mongodb";
-
-// import dotenv from "dotenv";
-// dotenv.config();
-
-console.log("MONGODB_URI: ", process.env.MONGODB_URI);
 
 // logger levels:
 // error: 0, warn: 1, info: 2, http: 3, verbose: 4, debug: 5, silly: 6
@@ -44,7 +38,7 @@ const logger = winston.createLogger({
   transports: [
     consoleTransport,
     fileTransport,
-    // new winston.transports.MongoDB(mongoDBOptions),
+    new winston.transports.MongoDB(mongoDBOptions),
   ],
 });
 

@@ -1,4 +1,3 @@
-console.log("server.js");
 // server.js
 // import files
 import app from "./app.js";

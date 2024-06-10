@@ -2,7 +2,6 @@
 // * @res.status returns:
 // * - error.code -- integer
 // * - error.severity -- string
-console.log("asyncHandler.js");
 import mongoose from "mongoose";
 import yup from "yup";
 
