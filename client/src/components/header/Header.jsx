@@ -76,7 +76,7 @@ const Header = () => {
                 paddingX={2}
                 style={{ textDecoration: "none", color: "white" }}
               >
-                Pet Life
+                Home Page
               </Typography>
             </Grid>
             <Grid item>
