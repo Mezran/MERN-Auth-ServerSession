@@ -258,30 +258,28 @@ describe("Server/api/user", () => {
 
   // ! PATCH /api/user (userUpdate)
   describe("PATCH /api/user", () => {
-    const userUpdateModel = {
+    const userUpdateModelInitial = {
       username: "userUpdateTest",
       email: "userUpdateTest@t.t",
       password: "userUpdateTest",
     };
     const userUpdateModel1 = {
       username: "userUpdateTest1",
-      email: "userUpdateTest1@t.t",
       password: "userUpdateTest1",
     };
     const userUpdateModel2 = {
       username: "userUpdateTest2",
-      email: "userUpdateTest2@t.t",
       password: "userUpdateTest2",
     };
     let cookie;
     beforeAll(async () => {
       // add user to db
-      const newUser = new User(userUpdateModel);
+      const newUser = new User(userUpdateModelInitial);
       await newUser.save();
       // get session cookie
       const res = await request(app).post("/api/user/login").send({
-        email: userUpdateModel.email,
-        password: userUpdateModel.password,
+        email: userUpdateModelInitial.email,
+        password: userUpdateModelInitial.password,
       });
       cookie = res.headers["set-cookie"];
     });
@@ -321,35 +319,19 @@ describe("Server/api/user", () => {
       test("all valid fields: should return 200 and success message", async () => {
         const res = await request(app).patch("/api/user").set("cookie", cookie).send({
           username: userUpdateModel1.username,
-          email: userUpdateModel1.email,
           password: userUpdateModel1.password,
-          passwordCurrent: userUpdateModel.password,
+          passwordCurrent: userUpdateModelInitial.password,
         });
         expect(res.status).toBe(200);
         expect(res.body.messages).toEqual(["User updated"]);
         // validate user update
         const updatedUser = await User.findOne({
-          email: userUpdateModel1.email,
+          email: userUpdateModelInitial.email,
         });
         expect(updatedUser.username).toBe(userUpdateModel1.username);
-        expect(updatedUser.email).toBe(userUpdateModel1.email);
+        expect(updatedUser.email).toBe(userUpdateModelInitial.email);
         expect(updatedUser.comparePasswords(userUpdateModel1.password)).toBe(true);
       }); // end all valid fields
-      test("valid email only: should return 200 and success message", async () => {
-        const res = await request(app).patch("/api/user").set("cookie", cookie).send({
-          email: userUpdateModel2.email,
-          passwordCurrent: userUpdateModel1.password,
-        });
-        expect(res.status).toBe(200);
-        expect(res.body.messages).toEqual(["User updated"]);
-        // validate user update
-        const updatedUser = await User.findOne({
-          email: userUpdateModel2.email,
-        });
-        expect(updatedUser.username).toBe(userUpdateModel1.username);
-        expect(updatedUser.email).toBe(userUpdateModel2.email);
-        expect(updatedUser.comparePasswords(userUpdateModel1.password)).toBe(true);
-      }); // end valid email only
       test("valid username only: should return 200 and success message", async () => {
         const res = await request(app).patch("/api/user").set("cookie", cookie).send({
           username: userUpdateModel2.username,
@@ -359,10 +341,10 @@ describe("Server/api/user", () => {
         expect(res.body.messages).toEqual(["User updated"]);
         // validate user update
         const updatedUser = await User.findOne({
-          email: userUpdateModel2.email,
+          email: userUpdateModelInitial.email,
         });
         expect(updatedUser.username).toBe(userUpdateModel2.username);
-        expect(updatedUser.email).toBe(userUpdateModel2.email);
+        expect(updatedUser.email).toBe(userUpdateModelInitial.email);
         expect(updatedUser.comparePasswords(userUpdateModel1.password)).toBe(true);
       }); // end valid username only
       test("valid password only: should return 200 and success message", async () => {
@@ -374,10 +356,10 @@ describe("Server/api/user", () => {
         expect(res.body.messages).toEqual(["User updated"]);
         // validate user update
         const updatedUser = await User.findOne({
-          email: userUpdateModel2.email,
+          email: userUpdateModelInitial.email,
         });
         expect(updatedUser.username).toBe(userUpdateModel2.username);
-        expect(updatedUser.email).toBe(userUpdateModel2.email);
+        expect(updatedUser.email).toBe(userUpdateModelInitial.email);
         expect(updatedUser.comparePasswords(userUpdateModel2.password)).toBe(true);
       }); // end valid password only
     }); // end valid data

@@ -73,8 +73,13 @@ export const userLogout = asyncHandler(async (req, res) => {
 
 // UPDATE /api/user
 export const userUpdate = asyncHandler(async (req, res) => {
-  const { username, email, password, passwordCurrent } = req.body;
-  if (username == undefined && email == undefined && password == undefined)
+  const userToUpdate = {};
+  if (req.body.username) userToUpdate.username = req.body.username;
+  if (req.body.password) userToUpdate.password = req.body.password;
+  if (req.body.passwordCurrent) userToUpdate.passwordCurrent = req.body.passwordCurrent;
+
+  console.log(userToUpdate);
+  if (userToUpdate.username == undefined && userToUpdate.password == undefined)
     throw {
       name: "InfoError",
       code: 400,
@@ -82,12 +87,9 @@ export const userUpdate = asyncHandler(async (req, res) => {
       messages: ["No changes submitted"],
     };
 
-  await userUpdateSchema.validate(
-    { email, username, password, passwordCurrent },
-    { abortEarly: false }
-  );
+  await userUpdateSchema.validate(userToUpdate, { abortEarly: false });
 
-  if (!req.user || !req.user.comparePasswords(passwordCurrent))
+  if (!req.user || !req.user.comparePasswords(userToUpdate.passwordCurrent))
     throw {
       name: "UserError",
       code: 401,
@@ -95,11 +97,9 @@ export const userUpdate = asyncHandler(async (req, res) => {
       messages: ["Invalid current password"],
     };
 
-  const updatedUser = await User.findByIdAndUpdate(
-    req.user._id,
-    { username, email, password },
-    { new: true }
-  );
+  const updatedUser = await User.findByIdAndUpdate(req.user._id, userToUpdate, {
+    new: true,
+  });
 
   const sessionUser = sessionizeUser(updatedUser);
   req.session.user = sessionUser;

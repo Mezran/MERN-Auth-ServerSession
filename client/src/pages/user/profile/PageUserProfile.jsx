@@ -50,8 +50,10 @@ const PageUserProfile = () => {
   // React Hook Form
   // - schema
   const schema = yup.object().shape({
-    email: yup.string().email(),
-    emailConfirm: yup.string().oneOf([yup.ref("email"), undefined], "Emails must match"),
+    username: yup.string(),
+    usernameConfirm: yup
+      .string()
+      .oneOf([yup.ref("username"), undefined], "Usernames must match"),
 
     password: yup
       .string()
@@ -78,8 +80,8 @@ const PageUserProfile = () => {
 
   // - defaultValues
   const defaultValues = {
-    email: "",
-    emailConfirm: "",
+    username: "",
+    usernameConfirm: "",
     password: "",
     passwordConfirm: "",
     passwordCurrent: "",
@@ -89,6 +91,7 @@ const PageUserProfile = () => {
   const {
     handleSubmit,
     resetField,
+    reset,
     getValues,
     formState: { errors, isDirty, dirtyFields },
     control,
@@ -104,7 +107,7 @@ const PageUserProfile = () => {
 
   const onUpdateProfileDialogClose = () => {
     setUpdateProfileDialogState(false);
-    resetField("passwordCurrent");
+    reset();
   };
 
   const onUpdateProfileDialogConfirmed = () => {
@@ -118,7 +121,7 @@ const PageUserProfile = () => {
 
   const onDeleteProfileDialogClose = () => {
     setDeleteProfileDialogState(false);
-    resetField("passwordCurrent");
+    reset();
   };
 
   const onDeleteProfileDialogConfirmed = async () => {
@@ -142,7 +145,7 @@ const PageUserProfile = () => {
             <Grid container alignItems="center">
               <Grid item>
                 <Typography>
-                  Profile: {user.user.username} | Email: {user.user.email}
+                  Email: {user.user.email} | Username: {user.user.username}
                 </Typography>
               </Grid>
               <Grid item xs />
@@ -163,10 +166,14 @@ const PageUserProfile = () => {
         <Box>
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              <CTextField name="email" label="Email" control={control} />
+              <CTextField name="username" label="Username" control={control} />
             </Grid>
             <Grid item xs={6}>
-              <CTextField name="emailConfirm" label="Confirm Email" control={control} />
+              <CTextField
+                name="usernameConfirm"
+                label="Confirm Username"
+                control={control}
+              />
             </Grid>
           </Grid>
           <Grid container spacing={2}>
@@ -212,7 +219,7 @@ const PageUserProfile = () => {
             <Typography pb={1}>
               Please enter your password. The following account credentials will change:
             </Typography>
-            <Typography>{dirtyFields.email ? "- Email" : ""}</Typography>
+            <Typography>{dirtyFields.username ? "- Username" : ""}</Typography>
             <Typography>{dirtyFields.password ? "- Password" : ""}</Typography>
 
             <CTextField

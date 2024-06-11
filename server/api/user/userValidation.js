@@ -12,7 +12,6 @@ export const userLoginSchema = yup.object().shape({
 });
 
 export const userUpdateSchema = yup.object().shape({
-  email: yup.string().email().optional(),
   username: yup.string().optional(),
   password: yup.string().optional(),
   passwordCurrent: yup.string().required("Current password is required"),
