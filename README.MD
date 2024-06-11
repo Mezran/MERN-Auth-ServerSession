@@ -66,7 +66,7 @@ With this project I want to create a simple MERN stack application with session 
 ### Frontend:
 
 1. Install the dependencies for the frontend
-   - `cd frontend`
+   - `cd client`
    - `npm install`
 2. Start the frontend
    - `npm run dev`
@@ -74,7 +74,7 @@ With this project I want to create a simple MERN stack application with session 
 ### Backend:
 
 1. Install the dependencies for the backend
-   - `cd backend`
+   - `cd server`
    - `npm install`
 2. Create a `.env` file in the backend directory, see `.env.template` for required variables
 3. Start the backend with nodemon
