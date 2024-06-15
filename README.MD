@@ -77,6 +77,9 @@ With this project I want to create a simple MERN stack application with session 
    - `cd server`
    - `npm install`
 2. Create a `.env` file in the backend directory, see `.env.template` for required variables
+
+   - Ensure that the PORT number is the same as the frontend port number, see client/src/redux/constants.js
+
 3. Start the backend with nodemon
    - `npm run dev`
 
