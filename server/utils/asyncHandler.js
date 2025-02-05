@@ -13,7 +13,6 @@ const asyncHandler = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch((error) => {
     process.env.NODE_ENV !== "test" ? logger.error("Async handler error: ", error) : null;
 
-    // console.log(error);
     // ! ---- Mongoose Error ----
     if (
       error instanceof mongoose.Error.ValidationError ||
