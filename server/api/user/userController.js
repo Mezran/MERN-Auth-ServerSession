@@ -1,5 +1,4 @@
 // imports
-import asyncHandler from "../../utils/asyncHandler.js";
 import User from "./userModel.js";
 import {
   userRegisterSchema,
@@ -10,7 +9,7 @@ import {
 import { sessionizeUser } from "../../utils/helpers.js";
 
 // POST /api/user/register
-export const userRegister = asyncHandler(async (req, res) => {
+export const userRegister = async (req, res) => {
   const { username, email, password } = req.body;
 
   // await signUp.validateAsync({ username, email, password });
@@ -25,10 +24,10 @@ export const userRegister = asyncHandler(async (req, res) => {
   const sessionUser = sessionizeUser(newUser);
   req.session.user = sessionUser;
   res.send({ user: sessionUser, messages: ["User registered"] });
-});
+};
 
 // POST /api/user/login
-export const userLogin = asyncHandler(async (req, res) => {
+export const userLogin = async (req, res) => {
   const { email, password } = req.body;
   await userLoginSchema.validate({ email, password }, { abortEarly: false });
 
@@ -44,20 +43,20 @@ export const userLogin = asyncHandler(async (req, res) => {
   const sessionUser = sessionizeUser(user);
   req.session.user = sessionUser;
   res.send({ user: sessionUser, messages: ["Logged in"] });
-});
+};
 
 // GET /api/user/session
-export const userSession = asyncHandler(async (req, res) => {
+export const userSession = async (req, res) => {
   const { user } = req.session;
   if (!user) return res.send({ user: null });
 
   const sessionUser = sessionizeUser(user);
   req.session.user = sessionUser;
   res.send({ user: sessionUser });
-});
+};
 
 // DELETE /api/user/logout
-export const userLogout = asyncHandler(async (req, res) => {
+export const userLogout = async (req, res) => {
   const { user } = req.session;
 
   if (!user)
@@ -69,16 +68,15 @@ export const userLogout = asyncHandler(async (req, res) => {
     res.session = null;
     res.send({ user: null, messages: ["Logged out"] });
   });
-});
+};
 
 // UPDATE /api/user
-export const userUpdate = asyncHandler(async (req, res) => {
+export const userUpdate = async (req, res) => {
   const userToUpdate = {};
   if (req.body.username) userToUpdate.username = req.body.username;
   if (req.body.password) userToUpdate.password = req.body.password;
   if (req.body.passwordCurrent) userToUpdate.passwordCurrent = req.body.passwordCurrent;
 
-  console.log(userToUpdate);
   if (userToUpdate.username == undefined && userToUpdate.password == undefined)
     throw {
       name: "InfoError",
@@ -104,10 +102,10 @@ export const userUpdate = asyncHandler(async (req, res) => {
   const sessionUser = sessionizeUser(updatedUser);
   req.session.user = sessionUser;
   res.send({ user: sessionUser, messages: ["User updated"] });
-});
+};
 
 // DELETE /api/user
-export const userDelete = asyncHandler(async (req, res) => {
+export const userDelete = async (req, res) => {
   const { passwordCurrent } = req.body;
 
   await userDeleteSchema.validate({ passwordCurrent }, { abortEarly: false });
@@ -128,4 +126,4 @@ export const userDelete = asyncHandler(async (req, res) => {
     res.session = null;
     res.send({ user: null, messages: ["User deleted"] });
   });
-});
+};

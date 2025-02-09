@@ -1,5 +1,5 @@
 //
-import asyncHandler from "../../utils/asyncHandler.js";
+import { asyncHandler } from "../../utils/asyncHandler.js";
 
 // GET /api/test/logger-error
 export const testLoggerError = asyncHandler(async (req, res) => {

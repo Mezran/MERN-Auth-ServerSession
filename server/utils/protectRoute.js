@@ -1,5 +1,5 @@
 import User from "../api/user/userModel.js";
-import asyncHandler from "./asyncHandler.js";
+import { asyncHandler } from "./asyncHandler.js";
 // middleware that checks if the user is logged in
 // by sessions
 

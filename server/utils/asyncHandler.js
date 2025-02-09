@@ -9,10 +9,13 @@ import yup from "yup";
 import logger from "../services/logger.js";
 
 // * - error.messages -- [string]
-const asyncHandler = (fn) => (req, res, next) => {
-  Promise.resolve(fn(req, res, next)).catch((error) => {
+export const asyncHandler = (fn) => async (req, res, next) => {
+  try {
+    await fn(req, res, next);
+  } catch (error) {
     process.env.NODE_ENV !== "test" ? logger.error("Async handler error: ", error) : null;
 
+    // console.log(error);
     // ! ---- Mongoose Error ----
     if (
       error instanceof mongoose.Error.ValidationError ||
@@ -54,7 +57,5 @@ const asyncHandler = (fn) => (req, res, next) => {
     else {
       return res.status(500).json({ messages: ["Server error"], error: error });
     }
-  });
+  }
 };
-
-export default asyncHandler;

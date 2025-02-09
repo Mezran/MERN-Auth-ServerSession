@@ -1,5 +1,6 @@
 import express from "express";
 import { protectRoute } from "../../utils/protectRoute.js";
+import { asyncHandler } from "../../utils/asyncHandler.js";
 import {
   userLogin,
   userRegister,
@@ -11,10 +12,10 @@ import {
 
 const userRoutes = express.Router();
 
-userRoutes.post("/register", userRegister);
-userRoutes.post("/login", userLogin);
-userRoutes.delete("/logout", userLogout);
-userRoutes.get("/session", userSession);
-userRoutes.patch("/", protectRoute, userUpdate);
-userRoutes.delete("/", protectRoute, userDelete);
+userRoutes.post("/register", asyncHandler(userRegister));
+userRoutes.post("/login", asyncHandler(userLogin));
+userRoutes.delete("/logout", asyncHandler(userLogout));
+userRoutes.get("/session", asyncHandler(userSession));
+userRoutes.patch("/", protectRoute, asyncHandler(userUpdate));
+userRoutes.delete("/", protectRoute, asyncHandler(userDelete));
 export default userRoutes;
