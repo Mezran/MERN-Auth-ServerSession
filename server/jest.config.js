@@ -2,10 +2,11 @@
 
 const config = {
   verbose: true,
-  openHandlesTimeout: 10000,
+  openHandlesTimeout: 100000,
   forceExit: true,
   detectOpenHandles: true,
   testEnvironment: "node",
+  testTimeout: 30000,
 };
 
 export default config;

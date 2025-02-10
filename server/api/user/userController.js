@@ -48,7 +48,9 @@ export const userLogin = async (req, res) => {
 // GET /api/user/session
 export const userSession = async (req, res) => {
   const { user } = req.session;
-  if (!user) return res.send({ user: null });
+  if (!user || !user.email) return userLogout(req, res);
+  const userExists = await User.findOne({ email: user.email });
+  if (!userExists) return userLogout(req, res);
 
   const sessionUser = sessionizeUser(user);
   req.session.user = sessionUser;
