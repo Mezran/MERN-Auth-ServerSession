@@ -1,4 +1,7 @@
 import mongoose from "mongoose";
+import User from "../api/user/userModel";
+import request from "supertest";
+import app from "../app";
 
 export const connectDB = async () => {
   try {
@@ -50,3 +53,24 @@ export const clearSessions = async () => {
     await mongoose.connection.db.collection("sessions").drop();
   }
 };
+
+export async function createTestUserAndGetCookie(username) {
+  const userModel = {
+    username: username,
+    email: `${username}@t.t`,
+    password: username,
+  };
+
+  const newUser = new User(userModel);
+  await newUser.save();
+
+  const res = await request(app).post("/api/user/login").send({
+    email: userModel.email,
+    password: userModel.password,
+  });
+
+  return {
+    user: userModel,
+    cookie: res.headers["set-cookie"],
+  };
+}

@@ -2,7 +2,13 @@ import mongoose from "mongoose";
 import request from "supertest";
 import app from "../../../app.js";
 import User from "../userModel.js";
-import { connectDB, closeDB, clearDB } from "../../../test/db.js";
+import {
+  connectDB,
+  closeDB,
+  clearDB,
+  clearSessions,
+  createTestUserAndGetCookie,
+} from "../../../test/db.js";
 
 describe("DELETE /api/user/logout", () => {
   beforeAll(async () => {
@@ -15,6 +21,7 @@ describe("DELETE /api/user/logout", () => {
 
   describe("DELETE /api/user/logout", () => {
     let cookie;
+    let testUser;
     const userLogoutModel = {
       username: "userLogoutTest",
       email: "userLogoutTest@t.t",
@@ -29,26 +36,13 @@ describe("DELETE /api/user/logout", () => {
     }); // end no session
     describe("valid data", () => {
       beforeAll(async () => {
-        // add user to db
-        const newUser = new User(userLogoutModel);
-        await newUser.save();
-        // get session cookie
-        const res = await request(app).post("/api/user/login").send({
-          email: userLogoutModel.email,
-          password: userLogoutModel.password,
-        });
-        cookie = res.headers["set-cookie"];
+        const result = await createTestUserAndGetCookie("userLogoutTest");
+        testUser = result.user;
+        cookie = result.cookie;
       });
-      afterAll(async () => {
-        // drop session collection if it exists
-        const collections = await mongoose.connection.db.listCollections().toArray();
-        const sessionCollectionExists = collections.some(
-          (collection) => collection.name === "session"
-        );
 
-        if (sessionCollectionExists) {
-          await mongoose.connection.db.collection("session").drop();
-        }
+      afterAll(async () => {
+        await clearSessions();
       });
       test("with session: should return 200 and user null", async () => {
         const res = await request(app).delete("/api/user/logout").set("cookie", cookie);

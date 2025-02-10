@@ -1,7 +1,13 @@
 import request from "supertest";
 import app from "../../../app.js";
 import User from "../userModel.js";
-import { connectDB, closeDB, clearDB, clearSessions } from "../../../test/db.js";
+import {
+  connectDB,
+  closeDB,
+  clearDB,
+  clearSessions,
+  createTestUserAndGetCookie,
+} from "../../../test/db.js";
 
 describe("GET /api/user/session", () => {
   beforeAll(async () => {
@@ -39,16 +45,11 @@ describe("GET /api/user/session", () => {
       });
     }); // end invalid data
     describe("valid data", () => {
+      let testUser;
       beforeAll(async () => {
-        // add user to db
-        const newUser = new User(userGetModel);
-        await newUser.save();
-        // get session cookie
-        const res = await request(app).post("/api/user/login").send({
-          email: userGetModel.email,
-          password: userGetModel.password,
-        });
-        cookie = res.headers["set-cookie"];
+        const result = await createTestUserAndGetCookie("userGetTest");
+        testUser = result.user;
+        cookie = result.cookie;
       });
       afterAll(async () => {
         await clearSessions();
@@ -57,8 +58,8 @@ describe("GET /api/user/session", () => {
         const res = await request(app).get("/api/user/session").set("cookie", cookie);
         expect(res.status).toBe(200);
         expect(res.body.user).toEqual({
-          username: userGetModel.username,
-          email: userGetModel.email,
+          username: testUser.username,
+          email: testUser.email,
         });
       }); // end with session
     }); // end valid data

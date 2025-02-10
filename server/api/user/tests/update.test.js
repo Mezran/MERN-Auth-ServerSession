@@ -2,7 +2,13 @@ import mongoose from "mongoose";
 import request from "supertest";
 import app from "../../../app.js";
 import User from "../userModel.js";
-import { connectDB, closeDB, clearDB } from "../../../test/db.js";
+import {
+  connectDB,
+  closeDB,
+  clearDB,
+  clearSessions,
+  createTestUserAndGetCookie,
+} from "../../../test/db.js";
 
 describe("PATCH /api/user", () => {
   beforeAll(async () => {
@@ -14,11 +20,8 @@ describe("PATCH /api/user", () => {
   });
 
   describe("PATCH /api/user", () => {
-    const userUpdateModelInitial = {
-      username: "userUpdateTest",
-      email: "userUpdateTest@t.t",
-      password: "userUpdateTest",
-    };
+    let cookie;
+    let testUser;
     const userUpdateModel1 = {
       username: "userUpdateTest1",
       password: "userUpdateTest1",
@@ -27,29 +30,17 @@ describe("PATCH /api/user", () => {
       username: "userUpdateTest2",
       password: "userUpdateTest2",
     };
-    let cookie;
-    beforeAll(async () => {
-      // add user to db
-      const newUser = new User(userUpdateModelInitial);
-      await newUser.save();
-      // get session cookie
-      const res = await request(app).post("/api/user/login").send({
-        email: userUpdateModelInitial.email,
-        password: userUpdateModelInitial.password,
-      });
-      cookie = res.headers["set-cookie"];
-    });
-    afterAll(async () => {
-      // drop session collection if it exists
-      const collections = await mongoose.connection.db.listCollections().toArray();
-      const sessionCollectionExists = collections.some(
-        (collection) => collection.name === "session"
-      );
 
-      if (sessionCollectionExists) {
-        await mongoose.connection.db.collection("session").drop();
-      }
+    beforeAll(async () => {
+      const result = await createTestUserAndGetCookie("userUpdateTest");
+      testUser = result.user;
+      cookie = result.cookie;
     });
+
+    afterAll(async () => {
+      await clearSessions();
+    });
+
     describe("invalid data", () => {
       test("no session: should return 401 and error", async () => {
         const res = await request(app).patch("/api/user/").send({});
@@ -76,16 +67,16 @@ describe("PATCH /api/user", () => {
         const res = await request(app).patch("/api/user").set("cookie", cookie).send({
           username: userUpdateModel1.username,
           password: userUpdateModel1.password,
-          passwordCurrent: userUpdateModelInitial.password,
+          passwordCurrent: testUser.password,
         });
         expect(res.status).toBe(200);
         expect(res.body.messages).toEqual(["User updated"]);
         // validate user update
         const updatedUser = await User.findOne({
-          email: userUpdateModelInitial.email,
+          email: testUser.email,
         });
         expect(updatedUser.username).toBe(userUpdateModel1.username);
-        expect(updatedUser.email).toBe(userUpdateModelInitial.email);
+        expect(updatedUser.email).toBe(testUser.email);
         expect(updatedUser.comparePasswords(userUpdateModel1.password)).toBe(true);
       }); // end all valid fields
       test("valid username only: should return 200 and success message", async () => {
@@ -97,10 +88,10 @@ describe("PATCH /api/user", () => {
         expect(res.body.messages).toEqual(["User updated"]);
         // validate user update
         const updatedUser = await User.findOne({
-          email: userUpdateModelInitial.email,
+          email: testUser.email,
         });
         expect(updatedUser.username).toBe(userUpdateModel2.username);
-        expect(updatedUser.email).toBe(userUpdateModelInitial.email);
+        expect(updatedUser.email).toBe(testUser.email);
         expect(updatedUser.comparePasswords(userUpdateModel1.password)).toBe(true);
       }); // end valid username only
       test("valid password only: should return 200 and success message", async () => {
@@ -112,10 +103,10 @@ describe("PATCH /api/user", () => {
         expect(res.body.messages).toEqual(["User updated"]);
         // validate user update
         const updatedUser = await User.findOne({
-          email: userUpdateModelInitial.email,
+          email: testUser.email,
         });
         expect(updatedUser.username).toBe(userUpdateModel2.username);
-        expect(updatedUser.email).toBe(userUpdateModelInitial.email);
+        expect(updatedUser.email).toBe(testUser.email);
         expect(updatedUser.comparePasswords(userUpdateModel2.password)).toBe(true);
       }); // end valid password only
     }); // end valid data

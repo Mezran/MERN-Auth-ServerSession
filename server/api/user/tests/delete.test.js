@@ -2,7 +2,13 @@ import mongoose from "mongoose";
 import request from "supertest";
 import app from "../../../app.js";
 import User from "../userModel.js";
-import { connectDB, closeDB, clearDB } from "../../../test/db.js";
+import {
+  connectDB,
+  closeDB,
+  clearDB,
+  clearSessions,
+  createTestUserAndGetCookie,
+} from "../../../test/db.js";
 
 describe("DELETE /api/user", () => {
   beforeAll(async () => {
@@ -14,34 +20,19 @@ describe("DELETE /api/user", () => {
   });
 
   describe("DELETE /api/user", () => {
-    const userDeleteModel = {
-      username: "userDeleteTest",
-      email: "userDeleteTest@t.t",
-      password: "userDeleteTest",
-    };
     let cookie;
-    beforeAll(async () => {
-      // add user to db
-      const newUser = new User(userDeleteModel);
-      await newUser.save();
-      // get session cookie
-      const res = await request(app).post("/api/user/login").send({
-        email: userDeleteModel.email,
-        password: userDeleteModel.password,
-      });
-      cookie = res.headers["set-cookie"];
-    });
-    afterAll(async () => {
-      // drop session collection if it exists
-      const collections = await mongoose.connection.db.listCollections().toArray();
-      const sessionCollectionExists = collections.some(
-        (collection) => collection.name === "session"
-      );
+    let testUser;
 
-      if (sessionCollectionExists) {
-        await mongoose.connection.db.collection("session").drop();
-      }
+    beforeAll(async () => {
+      const result = await createTestUserAndGetCookie("userDeleteTest");
+      testUser = result.user;
+      cookie = result.cookie;
     });
+
+    afterAll(async () => {
+      await clearSessions();
+    });
+
     describe("invalid data", () => {
       test("no session: should return 401 and error", async () => {
         const res = await request(app).delete("/api/user");
@@ -57,13 +48,13 @@ describe("DELETE /api/user", () => {
     describe("valid data", () => {
       test("all valid fields: should return 200 and success message", async () => {
         const res = await request(app).delete("/api/user").set("cookie", cookie).send({
-          passwordCurrent: userDeleteModel.password,
+          passwordCurrent: testUser.password,
         });
         expect(res.status).toBe(200);
         expect(res.body.messages).toEqual(["User deleted"]);
         // validate user delete
         const deletedUser = await User.findOne({
-          email: userDeleteModel.email,
+          email: testUser.email,
         });
         expect(deletedUser).toBeNull();
       }); // end all valid fields
